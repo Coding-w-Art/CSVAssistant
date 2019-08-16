@@ -59,12 +59,12 @@ namespace CSVAssistant
 
         private void OpenImageAction(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.OpenLocalImage();
+            Globals.ThisAddIn.OpenLocalResource();
         }
 
         private void OpenIOSImageAction(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.OpenI18nImage();
+            Globals.ThisAddIn.OpenI18nResource();
         }
 
         private void button13_Click(object sender, RibbonControlEventArgs e)

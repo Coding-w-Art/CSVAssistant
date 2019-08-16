@@ -8,6 +8,7 @@ using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
 using System.IO;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace CSVAssistant
 {
@@ -146,9 +147,8 @@ namespace CSVAssistant
         public void SaveAsUnicodeCSV(bool force, bool newFile)
         {
             if (!CheckId(false)) return;
-            if (!CheckContent()) return;
+            //if (!CheckContent()) return;
 
-            app.StatusBar = "";
             bool currDispAlert = app.DisplayAlerts;
             bool flag = true;
             int i;
@@ -395,7 +395,7 @@ namespace CSVAssistant
             for (int i = 4; 1 <= range.Rows.Count; i++)
             {
                 Excel.Range cell = range.Cells[i, 2];
-                if (string.IsNullOrEmpty(cell.Value2.toString()) || string.IsNullOrWhiteSpace(cell.Value2.toString()))
+                if (string.IsNullOrEmpty(cell.Value2) || string.IsNullOrWhiteSpace(cell.Value2))
                 {
                     cell.Activate();
                     MessageBox.Show("第" + i + "行内容错误。", "内容错误", MessageBoxButtons.OK, MessageBoxIcon.Stop);
@@ -456,48 +456,78 @@ namespace CSVAssistant
             }
         }
 
-        public void OpenLocalImage()
+        public void OpenLocalResource()
         {
-            string file = GetImage();
+            string file = GetCellContent();
             if (string.IsNullOrEmpty(file)) return;
 
-            string filePath = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + "/../../../../Client/Assets/XResources/" + file;
-            if (File.Exists(filePath + ".png"))
+            if (!OpenLocalImage(file))
             {
-                OpenImage(filePath + ".png");
-            }
-            else if(File.Exists(filePath + ".jpg"))
-            {
-                OpenImage(filePath + ".jpg");
-            }
-            else
-            {
-                MessageBox.Show("没有找到对应图片资源。\n" + filePath, "预览资源", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("没有找到填写的资源。\n" + file, "预览资源", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        public void OpenI18nImage()
+        public void OpenI18nResource()
         {
-            string file = "/XResources/" + GetImage();
+            string file = GetCellContent();
             if (string.IsNullOrEmpty(file)) return;
 
-            string filePath = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../../Client/Assets/Region/{0}{1}", GLOBAL_DIRECTORY, file);
+            if (!OpenI18nImage(file))
+            {
+                MessageBox.Show("没有找到填写的资源。\n" + file, "预览资源", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
+        public bool OpenLocalImage(string file)
+        {
+            string filePath = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + "/../../../../Client/Assets/XResources/" + file;
+            return OpenImage(filePath);
+        }
+
+        public bool OpenI18nImage(string file)
+        {
+            string filePath = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../../Client/Assets/Region/{0}{1}", GLOBAL_DIRECTORY, file);
+            return OpenImage(filePath);
+        }
+
+        public bool OpenImage(string filePath)
+        {
             if (File.Exists(filePath + ".png"))
             {
-                OpenImage(filePath + ".png");
+                ShowImage(filePath + ".png");
+                return true;
             }
             else if (File.Exists(filePath + ".jpg"))
             {
-                OpenImage(filePath + ".jpg");
+                ShowImage(filePath + ".jpg");
+                return true;
             }
-            else
+
+            if (filePath.Contains("UI/Texture/Character/Card"))
             {
-                MessageBox.Show("没有找到对应的图片资源。\n" + filePath, "资源预览", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                DirectoryInfo directory = new DirectoryInfo(Path.GetDirectoryName(app.ActiveWorkbook.FullName) + "/../../../../Client/Assets/XResources/UI/Texture/Character/Card");
+                if (directory.Exists)
+                {
+                    FileInfo[] files = directory.GetFiles(filePath.Substring(filePath.LastIndexOf('/') + 1) + ".png", SearchOption.AllDirectories);
+                    foreach (FileInfo fi in files)
+                    {
+                        if (fi.Exists && fi.Extension == ".png")
+                        {
+                            ShowImage(fi.FullName);
+                            return true;
+                        }
+                    }
+                }
             }
+
+            if (imageForm != null)
+            {
+                imageForm.Hide();
+            }
+            return false;
         }
 
-        public string GetImage()
+        public string GetCellContent()
         {
             string name = app.ActiveWorkbook.Name;
             if (!name.StartsWith("CSV") || !name.EndsWith(".csv")) return null;
@@ -512,9 +542,19 @@ namespace CSVAssistant
             return cell.Value2.ToString();
         }
 
-        public void OpenImage(string path)
+        ImageForm imageForm;
+        public void ShowImage(string path)
         {
-            System.Diagnostics.Process.Start(path);
+            if (imageForm != null)
+            {
+                imageForm.SetImage(path);
+                imageForm.Show();
+            }
+            else
+            {
+                imageForm = new ImageForm(path);
+                imageForm.Show();
+            }
         }
 
         public void FrozenTrailing()

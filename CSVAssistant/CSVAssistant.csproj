@@ -34,7 +34,7 @@
     <PublishUrl>X:\PPSG2_1.5.x_U\Tools\CsvChecker\CSVAssistant\</PublishUrl>
     <InstallUrl />
     <TargetCulture>zh-chs</TargetCulture>
-    <ApplicationVersion>3.0.0.141</ApplicationVersion>
+    <ApplicationVersion>3.0.0.168</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>false</UpdateEnabled>
     <UpdateInterval>0</UpdateInterval>
@@ -175,9 +175,18 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="ImageForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageForm.Designer.cs">
+      <DependentUpon>ImageForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <EmbeddedResource Include="ImageForm.resx">
+      <DependentUpon>ImageForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -217,6 +226,9 @@
       <DependentUpon>ThisAddIn.Designer.xml</DependentUpon>
     </Compile>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Opacity.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
