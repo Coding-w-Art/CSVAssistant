@@ -87,12 +87,27 @@ namespace CSVAssistant
 
         private void Button17_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.LoadCellFormat();
+            Globals.ThisAddIn.LoadCellFormat(true);
         }
 
         private void Button18_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.ClearCellFormat();
+            Globals.ThisAddIn.ClearCellFormat(false);
+        }
+
+        private void CheckBox1_Click(object sender, RibbonControlEventArgs e)
+        {
+            Globals.ThisAddIn.AutoLoadCellFormat();
+        }
+
+        private void Button20_Click(object sender, RibbonControlEventArgs e)
+        {
+            Globals.ThisAddIn.SaveCellFormat(true);
+        }
+
+        private void Button19_Click(object sender, RibbonControlEventArgs e)
+        {
+            Globals.ThisAddIn.ClearCellFormat(true);
         }
     }
 }

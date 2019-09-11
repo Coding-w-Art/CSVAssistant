@@ -59,9 +59,11 @@
             this.separator4 = this.Factory.CreateRibbonSeparator();
             this.label2 = this.Factory.CreateRibbonLabel();
             this.dropDown1 = this.Factory.CreateRibbonDropDown();
+            this.group6 = this.Factory.CreateRibbonGroup();
+            this.checkBox1 = this.Factory.CreateRibbonCheckBox();
+            this.separator6 = this.Factory.CreateRibbonSeparator();
             this.button1 = this.Factory.CreateRibbonButton();
             this.button2 = this.Factory.CreateRibbonButton();
-            this.button17 = this.Factory.CreateRibbonButton();
             this.button3 = this.Factory.CreateRibbonButton();
             this.button4 = this.Factory.CreateRibbonButton();
             this.button5 = this.Factory.CreateRibbonButton();
@@ -76,9 +78,10 @@
             this.button16 = this.Factory.CreateRibbonButton();
             this.button14 = this.Factory.CreateRibbonButton();
             this.button15 = this.Factory.CreateRibbonButton();
-            this.group6 = this.Factory.CreateRibbonGroup();
+            this.button17 = this.Factory.CreateRibbonButton();
+            this.button20 = this.Factory.CreateRibbonButton();
             this.button18 = this.Factory.CreateRibbonButton();
-            this.separator5 = this.Factory.CreateRibbonSeparator();
+            this.button19 = this.Factory.CreateRibbonButton();
             this.CSVAssistant.SuspendLayout();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
@@ -228,6 +231,27 @@
             this.dropDown1.ShowLabel = false;
             this.dropDown1.SelectionChanged += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.dropDown1_SelectionChanged);
             // 
+            // group6
+            // 
+            this.group6.Items.Add(this.button17);
+            this.group6.Items.Add(this.button20);
+            this.group6.Items.Add(this.separator6);
+            this.group6.Items.Add(this.button18);
+            this.group6.Items.Add(this.button19);
+            this.group6.Items.Add(this.checkBox1);
+            this.group6.Label = "样式工具";
+            this.group6.Name = "group6";
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.Label = "自动加载/保存样式";
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CheckBox1_Click);
+            // 
+            // separator6
+            // 
+            this.separator6.Name = "separator6";
+            // 
             // button1
             // 
             this.button1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
@@ -247,15 +271,6 @@
             this.button2.ScreenTip = "另存为 UTF-8 编码的 CSV 文件。";
             this.button2.ShowImage = true;
             this.button2.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.SaveAsButtonAction);
-            // 
-            // button17
-            // 
-            this.button17.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button17.Label = "加载样式";
-            this.button17.Name = "button17";
-            this.button17.OfficeImageId = "XDRichTextArea";
-            this.button17.ShowImage = true;
-            this.button17.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Button17_Click);
             // 
             // button3
             // 
@@ -384,26 +399,39 @@
             this.button15.ShowImage = true;
             this.button15.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button15_Click);
             // 
-            // group6
+            // button17
             // 
-            this.group6.Items.Add(this.button17);
-            this.group6.Items.Add(this.separator5);
-            this.group6.Items.Add(this.button18);
-            this.group6.Label = "样式工具";
-            this.group6.Name = "group6";
+            this.button17.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button17.Label = "加载样式";
+            this.button17.Name = "button17";
+            this.button17.OfficeImageId = "XDRichTextArea";
+            this.button17.ShowImage = true;
+            this.button17.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Button17_Click);
+            // 
+            // button20
+            // 
+            this.button20.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button20.Label = "保存样式";
+            this.button20.Name = "button20";
+            this.button20.OfficeImageId = "SaveItem";
+            this.button20.ShowImage = true;
+            this.button20.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Button20_Click);
             // 
             // button18
             // 
-            this.button18.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button18.Label = "清除样式";
+            this.button18.Label = "清除选中单元格样式";
             this.button18.Name = "button18";
             this.button18.OfficeImageId = "ClearAllFormatting";
             this.button18.ShowImage = true;
             this.button18.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Button18_Click);
             // 
-            // separator5
+            // button19
             // 
-            this.separator5.Name = "separator5";
+            this.button19.Label = "清除所有单元格样式";
+            this.button19.Name = "button19";
+            this.button19.OfficeImageId = "ClearAll";
+            this.button19.ShowImage = true;
+            this.button19.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Button19_Click);
             // 
             // Ribbon1
             // 
@@ -461,7 +489,10 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton button17;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group6;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton button18;
-        internal Microsoft.Office.Tools.Ribbon.RibbonSeparator separator5;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton button19;
+        internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox checkBox1;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton button20;
+        internal Microsoft.Office.Tools.Ribbon.RibbonSeparator separator6;
     }
 
     partial class ThisRibbonCollection

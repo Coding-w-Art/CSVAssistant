@@ -22,7 +22,6 @@ namespace CSVAssistant
         private const string UTF_16LE_BOM = "FFFE";
         private const string UTF_8_BOM = "EFBBBF";
         private string I8N_DIRECTORY = "";
-        private string configFile = "";
         private string jsonFile = "";
         Encoding encoding = new UTF8Encoding(false);
 
@@ -63,11 +62,9 @@ namespace CSVAssistant
         {
             SetGlobalDirectory();
             SetDiffRegionMenu();
-            configFile = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../Excel/{0}/{1}.{2}", I8N_DIRECTORY, Path.GetFileNameWithoutExtension(app.ActiveWorkbook.Name), "xlsx");
             jsonFile = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../Excel/{0}/{1}.{2}", I8N_DIRECTORY, Path.GetFileNameWithoutExtension(app.ActiveWorkbook.Name), "json");
-
-            Globals.Ribbons.Ribbon1.button17.Enabled = File.Exists(configFile);
-
+            Globals.Ribbons.Ribbon1.button17.Enabled = File.Exists(jsonFile);
+            Globals.Ribbons.Ribbon1.checkBox1.Checked = Properties.Settings.Default.autoLoadFormat;
         }
 
         public bool GetGlobalDirectory(out string directory)
@@ -139,8 +136,8 @@ namespace CSVAssistant
                 }
 
                 FrozenTrailing();
-                LoadCellFormat();
                 SetDiffRegionMenu();
+                LoadCellFormat(false);
             }
             else
             {
@@ -245,7 +242,7 @@ namespace CSVAssistant
                         try
                         {
                             sFlag = true; //This is to prevent this method getting called again from app_WorkbookBeforeSave event caused by the next SaveAs call
-                            SaveCellFormat();
+                            SaveCellFormat(false);
                             app.ActiveWorkbook.SaveAs(tempFile, Excel.XlFileFormat.xlUnicodeText);
                             app.ActiveWorkbook.Close();
 
@@ -340,14 +337,12 @@ namespace CSVAssistant
 
 
         //save a new excel file for recording formats.
-        private void SaveCellFormat()
+        public void SaveCellFormat(bool manual = false)
         {
-            //if (Directory.Exists(Path.GetDirectoryName(configFile)))
-            //{
-            //    app.ActiveWorkbook.SaveAs(configFile, Excel.XlFileFormat.xlWorkbookDefault);
-            //}
+            if (!manual && !Properties.Settings.Default.autoLoadFormat)
+                return;
 
-            if (!Directory.Exists(Path.GetDirectoryName(configFile)))
+            if (!Directory.Exists(Path.GetDirectoryName(jsonFile)))
                 return;
 
             List<CellFormatInfo> info = new List<CellFormatInfo>();
@@ -386,60 +381,13 @@ namespace CSVAssistant
 
             string json = JsonConvert.SerializeObject(info);
             File.WriteAllText(jsonFile, json, encoding);
+            Globals.Ribbons.Ribbon1.button17.Enabled = File.Exists(jsonFile);
         }
 
-        public void LoadCellFormat()
+        public void LoadCellFormat(bool manual = false)
         {
-            //if (!Directory.Exists(Path.GetDirectoryName(configFile)))
-            //    return;
-
-            //FileStream fileStream = new FileStream(configFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            //try
-            //{
-            //    ExcelPackage excel = new ExcelPackage(fileStream);
-            //    ExcelWorksheet sheet = excel.Workbook.Worksheets[1];
-            //    Excel.Worksheet workSheet = app.ActiveWorkbook.ActiveSheet;
-            //    int count = 0;
-            //    int totalCount = workSheet.UsedRange.Rows.Count * workSheet.UsedRange.Columns.Count;
-            //    for (int i = 1; i <= workSheet.UsedRange.Rows.Count; i++)
-            //    {
-            //        for (int j = 1; j <= workSheet.UsedRange.Columns.Count; j++)
-            //        {
-            //            OfficeOpenXml.Style.ExcelStyle style = sheet.Cells[i, j].Style;
-            //            Excel.Range workCell = workSheet.Cells[i, j];
-            //            if (style.Font.Bold)
-            //            {
-            //                workCell.Font.Bold = true;
-            //            }
-            //            if (style.Font.Italic)
-            //            {
-            //                workCell.Font.Italic = true;
-            //            }
-            //            workCell.Font.Name = style.Font.Name;
-            //            workCell.Font.Size = style.Font.Size;
-
-            //            if (!string.IsNullOrEmpty(style.Font.Color.Rgb))
-            //            {
-            //                workCell.Font.Color = TranslateColor(style.Font.Color.Rgb).ToArgb();
-            //            }
-
-            //            if (!string.IsNullOrEmpty(style.Fill.BackgroundColor.Rgb))
-            //            {
-            //                workCell.Interior.Color = TranslateColor(style.Fill.BackgroundColor.Rgb).ToArgb();
-            //            }
-
-            //            count++;
-            //            app.StatusBar = "正在加载样式... " + Math.Floor(count * 100 / (double)totalCount) + "%";
-            //        }
-            //    }
-            //    excel.Dispose();
-            //}
-            //catch (Exception e)
-            //{
-            //    app.StatusBar = "加载样式失败 " + e.ToString();
-            //}
-            //fileStream.Dispose();
-            //fileStream.Close();
+            if (!manual && !Properties.Settings.Default.autoLoadFormat)
+                return;
 
             if (!File.Exists(jsonFile))
                 return;
@@ -489,11 +437,29 @@ namespace CSVAssistant
             app.StatusBar = "就绪";
         }
 
-        public void ClearCellFormat()
+        public void ClearCellFormat(bool clearAll)
         {
-            Excel.Worksheet ws = app.ActiveWorkbook.ActiveSheet;
-            ws.UsedRange.ClearFormats();
-            ws.UsedRange.ClearNotes();
+            if (clearAll)
+            {
+                Excel.Worksheet ws = app.ActiveWorkbook.ActiveSheet;
+                ws.UsedRange.ClearFormats();
+                ws.UsedRange.ClearNotes();
+            }
+            else
+            {
+                Excel.Range range = app.Selection as Excel.Range;
+                if (range != null)
+                {
+                    range.ClearFormats();
+                    range.ClearNotes();
+                }
+            }
+        }
+
+        public void AutoLoadCellFormat()
+        {
+            Properties.Settings.Default.autoLoadFormat = Globals.Ribbons.Ribbon1.checkBox1.Checked;
+            Properties.Settings.Default.Save();
         }
 
         private Color TranslateColor(string color)
@@ -526,7 +492,7 @@ namespace CSVAssistant
             for (int i = 4; i <= range.Rows.Count; i++)
             {
                 Excel.Range cell2 = range.Cells[i, 2];
-                if (cell2.Value2 == null)
+                if (cell2.Value == null)
                     return;
 
                 Excel.Range cell1 = range.Cells[i, 1];
@@ -758,22 +724,6 @@ namespace CSVAssistant
             Excel.Range cell = range.Cells[4, GetForzenColumn(name)];
             cell.Activate();
             cell.Application.ActiveWindow.FreezePanes = true;
-        }
-
-        public void FormatColor()
-        {
-            string name = app.ActiveWorkbook.FullName;
-            if (!name.StartsWith("CSV")) return;
-            if (!name.EndsWith(".csv")) return;
-
-            Excel.Worksheet workSheet = app.ActiveWorkbook.ActiveSheet;
-            Excel.Range range = workSheet.UsedRange;
-
-            Excel.Range topRange = range.Range[range.Cells[1, 1], range.Cells[3, range.Columns.Count]];
-            topRange.Interior.ColorIndex = 35;
-
-            Excel.Range idRange = range.Range[range.Cells[4, 1], range.Cells[range.Rows.Count, 1]];
-            idRange.Interior.ColorIndex = 34;
         }
 
         int GetForzenColumn(string name)
