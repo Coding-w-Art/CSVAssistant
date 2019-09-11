@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Office.Tools.Ribbon;
+﻿using Microsoft.Office.Tools.Ribbon;
 
 namespace CSVAssistant
 {
     public partial class Ribbon1
     {
-        private void Ribbon1_Load(object sender, RibbonUIEventArgs e)
-        {
-        }
 
         private void SaveButtonAction(object sender, RibbonControlEventArgs e)
         {
@@ -90,6 +83,16 @@ namespace CSVAssistant
         private void dropDown1_SelectionChanged(object sender, RibbonControlEventArgs e)
         {
             Globals.ThisAddIn.SVNRegionDiff(dropDown1.SelectedItem.Tag.ToString());
+        }
+
+        private void Button17_Click(object sender, RibbonControlEventArgs e)
+        {
+            Globals.ThisAddIn.LoadCellFormat();
+        }
+
+        private void Button18_Click(object sender, RibbonControlEventArgs e)
+        {
+            Globals.ThisAddIn.ClearCellFormat();
         }
     }
 }

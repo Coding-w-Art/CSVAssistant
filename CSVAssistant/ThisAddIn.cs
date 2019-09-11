@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Drawing;
+using System.IO;
 using System.Text;
-using System.Xml.Linq;
+using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Core;
-using Microsoft.Office.Tools.Excel;
-using System.IO;
-using System.Windows.Forms;
-using System.Text.RegularExpressions;
 
 namespace CSVAssistant
 {
@@ -22,8 +21,33 @@ namespace CSVAssistant
         private const string UTF_16BE_BOM = "FEFF";
         private const string UTF_16LE_BOM = "FFFE";
         private const string UTF_8_BOM = "EFBBBF";
-        private string GLOBAL_DIRECTORY = "";
-        private ToolTip toolTip = new ToolTip();
+        private string I8N_DIRECTORY = "";
+        private string configFile = "";
+        private string jsonFile = "";
+        Encoding encoding = new UTF8Encoding(false);
+
+        private class CellFormatInfo
+        {
+            public int row;
+            public int column;
+            public bool bold;
+            public bool italic;
+            public int fontColor;
+            public int backgroundColor;
+            public string noteText;
+
+            public CellFormatInfo(int row, int column, bool bold = false, bool italic = false,
+                int fontColor = 0, int backgroundColor = 0, string noteText = "")
+            {
+                this.row = row;
+                this.column = column;
+                this.bold = bold;
+                this.italic = italic;
+                this.fontColor = fontColor;
+                this.backgroundColor = backgroundColor;
+                this.noteText = noteText;
+            }
+        }
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
@@ -39,6 +63,11 @@ namespace CSVAssistant
         {
             SetGlobalDirectory();
             SetDiffRegionMenu();
+            configFile = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../Excel/{0}/{1}.{2}", I8N_DIRECTORY, Path.GetFileNameWithoutExtension(app.ActiveWorkbook.Name), "xlsx");
+            jsonFile = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../Excel/{0}/{1}.{2}", I8N_DIRECTORY, Path.GetFileNameWithoutExtension(app.ActiveWorkbook.Name), "json");
+
+            Globals.Ribbons.Ribbon1.button17.Enabled = File.Exists(configFile);
+
         }
 
         public bool GetGlobalDirectory(out string directory)
@@ -92,8 +121,11 @@ namespace CSVAssistant
 
         void App_WorkbookBeforeClose(Excel.Workbook Wb, ref bool Cancel)
         {
-            unicodeFiles.Remove(Wb.FullName);
-            app.StatusBar = "就绪";
+            if (Path.GetExtension(Wb.FullName) == ".csv")
+            {
+                unicodeFiles.Remove(Wb.FullName);
+                app.StatusBar = "就绪";
+            }
         }
 
         void App_WorkbookOpen(Excel.Workbook Wb)
@@ -107,7 +139,7 @@ namespace CSVAssistant
                 }
 
                 FrozenTrailing();
-                //FormatColor();
+                LoadCellFormat();
                 SetDiffRegionMenu();
             }
             else
@@ -205,15 +237,15 @@ namespace CSVAssistant
                     try
                     {
                         //Getting current selection to restore the current cell selection
-                        Excel.Range rng = (Excel.Range)app.ActiveCell;
+                        Excel.Range rng = app.ActiveCell;
                         int row = rng.Row;
                         int col = rng.Column;
 
-                        string tempFile = System.IO.Path.GetTempFileName();
-
+                        string tempFile = Path.GetTempFileName();
                         try
                         {
                             sFlag = true; //This is to prevent this method getting called again from app_WorkbookBeforeSave event caused by the next SaveAs call
+                            SaveCellFormat();
                             app.ActiveWorkbook.SaveAs(tempFile, Excel.XlFileFormat.xlUnicodeText);
                             app.ActiveWorkbook.Close();
 
@@ -251,11 +283,11 @@ namespace CSVAssistant
                         Excel.Worksheet ws = app.ActiveWorkbook.ActiveSheet;
                         ws.Cells[row, col].Select();
                         app.StatusBar = "已保存为 UTF-8 编码的 CSV 文件。";
-                        FrozenTrailing();
                         if (!unicodeFiles.Contains(filename))
                         {
                             unicodeFiles.Add(filename);
                         }
+                        FrozenTrailing();
                         app.ActiveWorkbook.Saved = true;
                     }
                     catch (Exception e)
@@ -304,6 +336,170 @@ namespace CSVAssistant
                 //ignore any exception
             }
             return ret;
+        }
+
+
+        //save a new excel file for recording formats.
+        private void SaveCellFormat()
+        {
+            //if (Directory.Exists(Path.GetDirectoryName(configFile)))
+            //{
+            //    app.ActiveWorkbook.SaveAs(configFile, Excel.XlFileFormat.xlWorkbookDefault);
+            //}
+
+            if (!Directory.Exists(Path.GetDirectoryName(configFile)))
+                return;
+
+            List<CellFormatInfo> info = new List<CellFormatInfo>();
+            Excel.Worksheet workSheet = app.ActiveWorkbook.ActiveSheet;
+            for (int i = 1; i <= workSheet.UsedRange.Rows.Count; i++)
+            {
+                for (int j = 1; j <= workSheet.UsedRange.Columns.Count; j++)
+                {
+
+                    Excel.Range cell = workSheet.Cells[i, j];
+                    bool dirty = false;
+
+                    if (cell.Font.Bold)
+                        dirty = true;
+
+                    if (cell.Font.Italic)
+                        dirty = true;
+
+                    if (!string.IsNullOrEmpty(cell.NoteText()))
+                        dirty = true;
+
+                    int fontColor = (int)cell.Font.Color;
+                    if (fontColor != 0)
+                        dirty = true;
+
+                    int backgroundColor = (int)cell.Interior.Color;
+                    if (backgroundColor != 16777215)
+                        dirty = true;
+
+                    if (dirty)
+                    {
+                        info.Add(new CellFormatInfo(i, j, cell.Font.Bold, cell.Font.Italic, fontColor, backgroundColor, cell.NoteText()));
+                    }
+                }
+            }
+
+            string json = JsonConvert.SerializeObject(info);
+            File.WriteAllText(jsonFile, json, encoding);
+        }
+
+        public void LoadCellFormat()
+        {
+            //if (!Directory.Exists(Path.GetDirectoryName(configFile)))
+            //    return;
+
+            //FileStream fileStream = new FileStream(configFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            //try
+            //{
+            //    ExcelPackage excel = new ExcelPackage(fileStream);
+            //    ExcelWorksheet sheet = excel.Workbook.Worksheets[1];
+            //    Excel.Worksheet workSheet = app.ActiveWorkbook.ActiveSheet;
+            //    int count = 0;
+            //    int totalCount = workSheet.UsedRange.Rows.Count * workSheet.UsedRange.Columns.Count;
+            //    for (int i = 1; i <= workSheet.UsedRange.Rows.Count; i++)
+            //    {
+            //        for (int j = 1; j <= workSheet.UsedRange.Columns.Count; j++)
+            //        {
+            //            OfficeOpenXml.Style.ExcelStyle style = sheet.Cells[i, j].Style;
+            //            Excel.Range workCell = workSheet.Cells[i, j];
+            //            if (style.Font.Bold)
+            //            {
+            //                workCell.Font.Bold = true;
+            //            }
+            //            if (style.Font.Italic)
+            //            {
+            //                workCell.Font.Italic = true;
+            //            }
+            //            workCell.Font.Name = style.Font.Name;
+            //            workCell.Font.Size = style.Font.Size;
+
+            //            if (!string.IsNullOrEmpty(style.Font.Color.Rgb))
+            //            {
+            //                workCell.Font.Color = TranslateColor(style.Font.Color.Rgb).ToArgb();
+            //            }
+
+            //            if (!string.IsNullOrEmpty(style.Fill.BackgroundColor.Rgb))
+            //            {
+            //                workCell.Interior.Color = TranslateColor(style.Fill.BackgroundColor.Rgb).ToArgb();
+            //            }
+
+            //            count++;
+            //            app.StatusBar = "正在加载样式... " + Math.Floor(count * 100 / (double)totalCount) + "%";
+            //        }
+            //    }
+            //    excel.Dispose();
+            //}
+            //catch (Exception e)
+            //{
+            //    app.StatusBar = "加载样式失败 " + e.ToString();
+            //}
+            //fileStream.Dispose();
+            //fileStream.Close();
+
+            if (!File.Exists(jsonFile))
+                return;
+
+            string json = File.ReadAllText(jsonFile, encoding);
+            List<JObject> jsons = JsonConvert.DeserializeObject<List<JObject>>(json);
+            app.StatusBar = "start " + jsons.Count;
+            Excel.Range range = app.ActiveWorkbook.ActiveSheet.UsedRange;
+            int count = 0;
+            try
+            {
+                foreach (JObject obj in jsons)
+                {
+                    count++;
+                    app.StatusBar = "正在加载样式... " + Math.Floor(count * 100 / (double)jsons.Count) + "%";
+
+                    int row = obj.Value<int>("row");
+                    int column = obj.Value<int>("column");
+                    if (row > range.Rows.Count || column > range.Columns.Count)
+                        return;
+
+                    Excel.Range cell = range[row, column];
+
+                    cell.Font.Bold = obj.Value<bool>("bold");
+                    cell.Font.Italic = obj.Value<bool>("italic");
+
+                    int fontColor = obj.Value<int>("fontColor");
+                    if ((int)cell.Font.Color != fontColor)
+                    {
+                        cell.Font.Color = fontColor;
+                    }
+
+                    int backgroundColor = obj.Value<int>("backgroundColor");
+                    if ((int)cell.Interior.Color != backgroundColor)
+                    {
+                        cell.Interior.Color = backgroundColor;
+                    }
+
+                    cell.NoteText(obj.Value<string>("noteText"));
+                }
+            }
+            catch (Exception e)
+            {
+                app.StatusBar = "加载样式失败 " + e.ToString();
+                return;
+            }
+            app.StatusBar = "就绪";
+        }
+
+        public void ClearCellFormat()
+        {
+            Excel.Worksheet ws = app.ActiveWorkbook.ActiveSheet;
+            ws.UsedRange.ClearFormats();
+            ws.UsedRange.ClearNotes();
+        }
+
+        private Color TranslateColor(string color)
+        {
+            string htmlColor = string.Format("#{0}{1}{2}{3}", color.Substring(0, 2), color.Substring(6, 2), color.Substring(4, 2), color.Substring(2, 2));
+            return ColorTranslator.FromHtml(htmlColor);
         }
 
         public void ExpandColumn()
@@ -407,7 +603,7 @@ namespace CSVAssistant
 
         public void CSVChecker(bool checkAll)
         {
-            if (String.IsNullOrEmpty(GLOBAL_DIRECTORY))
+            if (String.IsNullOrEmpty(I8N_DIRECTORY))
                 return;
 
             System.Diagnostics.Process process = new System.Diagnostics.Process();
@@ -423,12 +619,12 @@ namespace CSVAssistant
             process.StartInfo.CreateNoWindow = false;
             if (checkAll)
             {
-                process.StartInfo.Arguments = GLOBAL_DIRECTORY;
+                process.StartInfo.Arguments = I8N_DIRECTORY;
             }
             else
             {
                 int index = app.ActiveWorkbook.Name.LastIndexOf(".");
-                process.StartInfo.Arguments = GLOBAL_DIRECTORY + "," + app.ActiveWorkbook.Name.Substring(0, index);
+                process.StartInfo.Arguments = I8N_DIRECTORY + "," + app.ActiveWorkbook.Name.Substring(0, index);
             }
             process.Start();
         }
@@ -438,16 +634,10 @@ namespace CSVAssistant
             string name = app.ActiveWorkbook.Name;
             if (!name.StartsWith("CSV")) return;
 
-            name = name.Replace("CSV", "");
-            string filePath = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + "/../../../../Tools/CsvChecker/checks/Check" + name;
-            //FileInfo fileInfo = new FileInfo(filePath);
+            name = name.Replace("CSV", "Check");
+            string filePath = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + "/../../../../Tools/CsvChecker/checks/" + name;
             if (File.Exists(filePath))
             {
-                //fileInfo.IsReadOnly = false;
-                //Excel.Application excel = new Excel.Application();
-                //Excel.Workbook workbook = excel.Application.Workbooks.Add(fileInfo.FullName);
-                //workbook.ChangeFileAccess(Excel.XlFileAccess.xlReadWrite);
-                //excel.Visible = true;
                 System.Diagnostics.Process.Start(filePath);
             }
             else
@@ -486,7 +676,7 @@ namespace CSVAssistant
 
         public bool OpenI18nImage(string file)
         {
-            string filePath = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../../Client/Assets/Region/{0}{1}", GLOBAL_DIRECTORY, file);
+            string filePath = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../../Client/Assets/Region/{0}{1}", I8N_DIRECTORY, file);
             return OpenImage(filePath);
         }
 
@@ -602,12 +792,12 @@ namespace CSVAssistant
 
         public void SetGlobalDirectory()
         {
-            if (GetGlobalDirectory(out GLOBAL_DIRECTORY))
+            if (GetGlobalDirectory(out I8N_DIRECTORY))
             {
-                Globals.Ribbons.Ribbon1.group3.Label = "表格检查 [" + GLOBAL_DIRECTORY + "]";
+                Globals.Ribbons.Ribbon1.group3.Label = "表格检查 [" + I8N_DIRECTORY + "]";
             }
 
-            if (string.IsNullOrEmpty(GLOBAL_DIRECTORY))
+            if (string.IsNullOrEmpty(I8N_DIRECTORY))
             {
                 Globals.Ribbons.Ribbon1.group3.Visible = false;
                 Globals.Ribbons.Ribbon1.group4.Visible = false;
@@ -619,7 +809,7 @@ namespace CSVAssistant
             Globals.Ribbons.Ribbon1.group4.Visible = true;
             Globals.Ribbons.Ribbon1.group5.Visible = true;
 
-            if (GLOBAL_DIRECTORY == "_Dev")
+            if (I8N_DIRECTORY == "_Dev")
             {
                 Globals.Ribbons.Ribbon1.button11.Enabled = false;
                 Globals.Ribbons.Ribbon1.button12.Enabled = false;
@@ -633,7 +823,7 @@ namespace CSVAssistant
 
         public void SetDiffRegionMenu()
         {
-            if (string.IsNullOrEmpty(GLOBAL_DIRECTORY))
+            if (string.IsNullOrEmpty(I8N_DIRECTORY))
             {
                 Globals.Ribbons.Ribbon1.dropDown1.Enabled = false;
                 return;
@@ -641,12 +831,12 @@ namespace CSVAssistant
 
             Globals.Ribbons.Ribbon1.dropDown1.Enabled = true;
 
-            if (Globals.Ribbons.Ribbon1.dropDown1.SelectedItem.Label == GLOBAL_DIRECTORY)
+            if (Globals.Ribbons.Ribbon1.dropDown1.SelectedItem.Label == I8N_DIRECTORY)
                 return;
 
             foreach (Microsoft.Office.Tools.Ribbon.RibbonDropDownItem item in Globals.Ribbons.Ribbon1.dropDown1.Items)
             {
-                if (item.Label == GLOBAL_DIRECTORY)
+                if (item.Label == I8N_DIRECTORY)
                 {
                     Globals.Ribbons.Ribbon1.dropDown1.SelectedItem = item;
                     break;
@@ -678,7 +868,7 @@ namespace CSVAssistant
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error" + "[" + i + "," + j + "]" + tmp + " "  + e.Message);
+                MessageBox.Show("Error" + "[" + i + "," + j + "]" + tmp + " " + e.Message);
             }
 
             //for (int i = 0; i <= range.Rows.Count; i++)
@@ -720,7 +910,7 @@ namespace CSVAssistant
         internal void SVNRegionDiff(string region)
         {
             string path2 = app.ActiveWorkbook.FullName;
-            string path1 = path2.Replace(GLOBAL_DIRECTORY, region);
+            string path1 = path2.Replace(I8N_DIRECTORY, region);
             InvokeSVNProcess("diff /path:" + path1 + " /path2:" + path2);
         }
 
@@ -735,7 +925,7 @@ namespace CSVAssistant
             this.Startup += new System.EventHandler(ThisAddIn_Startup);
             this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
         }
-        
+
         #endregion
     }
 }
