@@ -25,7 +25,7 @@ namespace CSVAssistant
             }
         }
 
-        private void PictureBox1_Click(object sender, EventArgs e)
+        private void PictureBox1_Click(object sender, MouseEventArgs e)
         {
             if (!mouseMove)
                 Hide();
@@ -51,6 +51,14 @@ namespace CSVAssistant
             mouseMove = false;
             mouseDown = false;
         }
+        private void PictureBox1_DoubleClick(object sender, MouseEventArgs e)
+        {
+            mouseMove = false;
+            mouseDown = false;
+            System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo("Explorer.exe");
+            psi.Arguments = "/select," + pictureBox1.ImageLocation.Replace('/', '\\');
+            System.Diagnostics.Process.Start(psi);
+        }
 
         private void PictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
@@ -60,7 +68,6 @@ namespace CSVAssistant
                 Point newPosition = MousePosition;
                 newPosition.Offset(-mPoint.X, -mPoint.Y);
                 Location = newPosition;
-
             }
         }
 

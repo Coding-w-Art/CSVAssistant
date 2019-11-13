@@ -49,39 +49,39 @@
             Microsoft.Office.Tools.Ribbon.RibbonDropDownItem ribbonDropDownItemImpl13 = this.Factory.CreateRibbonDropDownItem();
             this.CSVAssistant = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
-            this.separator1 = this.Factory.CreateRibbonSeparator();
-            this.group2 = this.Factory.CreateRibbonGroup();
-            this.separator2 = this.Factory.CreateRibbonSeparator();
-            this.group3 = this.Factory.CreateRibbonGroup();
-            this.group4 = this.Factory.CreateRibbonGroup();
-            this.separator3 = this.Factory.CreateRibbonSeparator();
-            this.group5 = this.Factory.CreateRibbonGroup();
-            this.separator4 = this.Factory.CreateRibbonSeparator();
-            this.label2 = this.Factory.CreateRibbonLabel();
-            this.dropDown1 = this.Factory.CreateRibbonDropDown();
-            this.group6 = this.Factory.CreateRibbonGroup();
-            this.checkBox1 = this.Factory.CreateRibbonCheckBox();
-            this.separator6 = this.Factory.CreateRibbonSeparator();
             this.button1 = this.Factory.CreateRibbonButton();
+            this.separator1 = this.Factory.CreateRibbonSeparator();
             this.button2 = this.Factory.CreateRibbonButton();
+            this.group2 = this.Factory.CreateRibbonGroup();
             this.button3 = this.Factory.CreateRibbonButton();
             this.button4 = this.Factory.CreateRibbonButton();
+            this.separator2 = this.Factory.CreateRibbonSeparator();
             this.button5 = this.Factory.CreateRibbonButton();
             this.button6 = this.Factory.CreateRibbonButton();
+            this.group3 = this.Factory.CreateRibbonGroup();
             this.button7 = this.Factory.CreateRibbonButton();
             this.button8 = this.Factory.CreateRibbonButton();
             this.button9 = this.Factory.CreateRibbonButton();
+            this.group4 = this.Factory.CreateRibbonGroup();
             this.button10 = this.Factory.CreateRibbonButton();
+            this.separator3 = this.Factory.CreateRibbonSeparator();
             this.button11 = this.Factory.CreateRibbonButton();
             this.button12 = this.Factory.CreateRibbonButton();
+            this.group5 = this.Factory.CreateRibbonGroup();
             this.button13 = this.Factory.CreateRibbonButton();
             this.button16 = this.Factory.CreateRibbonButton();
             this.button14 = this.Factory.CreateRibbonButton();
+            this.separator4 = this.Factory.CreateRibbonSeparator();
             this.button15 = this.Factory.CreateRibbonButton();
+            this.label2 = this.Factory.CreateRibbonLabel();
+            this.dropDown1 = this.Factory.CreateRibbonDropDown();
+            this.group6 = this.Factory.CreateRibbonGroup();
             this.button17 = this.Factory.CreateRibbonButton();
             this.button20 = this.Factory.CreateRibbonButton();
+            this.separator6 = this.Factory.CreateRibbonSeparator();
             this.button18 = this.Factory.CreateRibbonButton();
             this.button19 = this.Factory.CreateRibbonButton();
+            this.checkBox1 = this.Factory.CreateRibbonCheckBox();
             this.CSVAssistant.SuspendLayout();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
@@ -110,9 +110,29 @@
             this.group1.Label = "保存";
             this.group1.Name = "group1";
             // 
+            // button1
+            // 
+            this.button1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button1.Label = "保存";
+            this.button1.Name = "button1";
+            this.button1.OfficeImageId = "FileSave";
+            this.button1.ScreenTip = "保存当前的 CSV 文件。如果当前文件不是 CSV，则另存为 CSV 文件。";
+            this.button1.ShowImage = true;
+            this.button1.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.SaveButtonAction);
+            // 
             // separator1
             // 
             this.separator1.Name = "separator1";
+            // 
+            // button2
+            // 
+            this.button2.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button2.Label = "另存为…";
+            this.button2.Name = "button2";
+            this.button2.OfficeImageId = "FileSaveAs";
+            this.button2.ScreenTip = "另存为 UTF-8 编码的 CSV 文件。";
+            this.button2.ShowImage = true;
+            this.button2.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.SaveAsButtonAction);
             // 
             // group2
             // 
@@ -124,9 +144,49 @@
             this.group2.Label = "快捷工具";
             this.group2.Name = "group2";
             // 
+            // button3
+            // 
+            this.button3.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button3.Label = "最佳宽度";
+            this.button3.Name = "button3";
+            this.button3.OfficeImageId = "SizeToControlWidth";
+            this.button3.ScreenTip = "根据内容长度调整列宽度，使内容完整显示出来。";
+            this.button3.ShowImage = true;
+            this.button3.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ExpandAction);
+            // 
+            // button4
+            // 
+            this.button4.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button4.Label = "默认宽度";
+            this.button4.Name = "button4";
+            this.button4.OfficeImageId = "FormatCellsMenu";
+            this.button4.ScreenTip = "将所有列的宽度调整为默认宽度（80像素）。";
+            this.button4.ShowImage = true;
+            this.button4.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CollapseAction);
+            // 
             // separator2
             // 
             this.separator2.Name = "separator2";
+            // 
+            // button5
+            // 
+            this.button5.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button5.Label = "生成序号";
+            this.button5.Name = "button5";
+            this.button5.OfficeImageId = "FormatNumberDefault";
+            this.button5.ScreenTip = "将序号列由1开始递增填充。";
+            this.button5.ShowImage = true;
+            this.button5.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.FormatAction);
+            // 
+            // button6
+            // 
+            this.button6.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button6.Label = "检查序号";
+            this.button6.Name = "button6";
+            this.button6.OfficeImageId = "FileViewDigitalSignatures";
+            this.button6.ScreenTip = "检查序号列是否有重复的序号。";
+            this.button6.ShowImage = true;
+            this.button6.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.IdCheckAction);
             // 
             // group3
             // 
@@ -135,6 +195,36 @@
             this.group3.Items.Add(this.button9);
             this.group3.Label = "表格检查";
             this.group3.Name = "group3";
+            // 
+            // button7
+            // 
+            this.button7.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button7.Label = "检查当前表格";
+            this.button7.Name = "button7";
+            this.button7.OfficeImageId = "FileMarkAsFinal";
+            this.button7.ScreenTip = "使用表格检查工具检查当前表格。";
+            this.button7.ShowImage = true;
+            this.button7.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CSVCheckAction);
+            // 
+            // button8
+            // 
+            this.button8.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button8.Label = "检查所有表格";
+            this.button8.Name = "button8";
+            this.button8.OfficeImageId = "ReviewEndReviewPowerPoint";
+            this.button8.ScreenTip = "使用表格检查工具检查所有表格。";
+            this.button8.ShowImage = true;
+            this.button8.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CSVCheckAllAction);
+            // 
+            // button9
+            // 
+            this.button9.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button9.Label = "打开检查表";
+            this.button9.Name = "button9";
+            this.button9.OfficeImageId = "OpenAttachedMasterPage";
+            this.button9.ScreenTip = "打开对应CSV的检查配置表格。";
+            this.button9.ShowImage = true;
+            this.button9.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CSVOpenCheckAction);
             // 
             // group4
             // 
@@ -145,9 +235,34 @@
             this.group4.Label = "资源预览";
             this.group4.Name = "group4";
             // 
+            // button10
+            // 
+            this.button10.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button10.Label = "预览默认资源";
+            this.button10.Name = "button10";
+            this.button10.OfficeImageId = "OmsImageFromFile";
+            this.button10.ScreenTip = "预览选中单元格中资源路径对应的默认图片资源。";
+            this.button10.ShowImage = true;
+            this.button10.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OpenImageAction);
+            // 
             // separator3
             // 
             this.separator3.Name = "separator3";
+            // 
+            // button11
+            // 
+            this.button11.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.button11.Label = "预览国际化资源";
+            this.button11.Name = "button11";
+            this.button11.OfficeImageId = "OmsImageFromClip";
+            this.button11.ScreenTip = "预览选中单元格中国际化资源路径对应的图片资源。";
+            this.button11.ShowImage = true;
+            this.button11.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OpenIOSImageAction);
+            // 
+            // button12
+            // 
+            this.button12.Label = "";
+            this.button12.Name = "button12";
             // 
             // group5
             // 
@@ -161,9 +276,41 @@
             this.group5.Label = "SVN 工具";
             this.group5.Name = "group5";
             // 
+            // button13
+            // 
+            this.button13.Label = "提交";
+            this.button13.Name = "button13";
+            this.button13.OfficeImageId = "UpgradeWorkbook";
+            this.button13.ShowImage = true;
+            this.button13.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button13_Click);
+            // 
+            // button16
+            // 
+            this.button16.Label = "查看日志";
+            this.button16.Name = "button16";
+            this.button16.OfficeImageId = "ContactProperties";
+            this.button16.ShowImage = true;
+            this.button16.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button16_Click);
+            // 
+            // button14
+            // 
+            this.button14.Label = "还原";
+            this.button14.Name = "button14";
+            this.button14.OfficeImageId = "Refresh";
+            this.button14.ShowImage = true;
+            this.button14.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button14_Click);
+            // 
             // separator4
             // 
             this.separator4.Name = "separator4";
+            // 
+            // button15
+            // 
+            this.button15.Label = "和仓库版本比较";
+            this.button15.Name = "button15";
+            this.button15.OfficeImageId = "ReviewCompareLastVersion";
+            this.button15.ShowImage = true;
+            this.button15.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button15_Click);
             // 
             // label2
             // 
@@ -241,163 +388,7 @@
             this.group6.Items.Add(this.checkBox1);
             this.group6.Label = "样式工具";
             this.group6.Name = "group6";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.Label = "自动加载/保存样式";
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CheckBox1_Click);
-            // 
-            // separator6
-            // 
-            this.separator6.Name = "separator6";
-            // 
-            // button1
-            // 
-            this.button1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button1.Label = "保存";
-            this.button1.Name = "button1";
-            this.button1.OfficeImageId = "FileSave";
-            this.button1.ScreenTip = "保存当前的 CSV 文件。如果当前文件不是 CSV，则另存为 CSV 文件。";
-            this.button1.ShowImage = true;
-            this.button1.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.SaveButtonAction);
-            // 
-            // button2
-            // 
-            this.button2.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button2.Label = "另存为…";
-            this.button2.Name = "button2";
-            this.button2.OfficeImageId = "FileSaveAs";
-            this.button2.ScreenTip = "另存为 UTF-8 编码的 CSV 文件。";
-            this.button2.ShowImage = true;
-            this.button2.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.SaveAsButtonAction);
-            // 
-            // button3
-            // 
-            this.button3.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button3.Label = "最佳宽度";
-            this.button3.Name = "button3";
-            this.button3.OfficeImageId = "SizeToControlWidth";
-            this.button3.ScreenTip = "根据内容长度调整列宽度，使内容完整显示出来。";
-            this.button3.ShowImage = true;
-            this.button3.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ExpandAction);
-            // 
-            // button4
-            // 
-            this.button4.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button4.Label = "默认宽度";
-            this.button4.Name = "button4";
-            this.button4.OfficeImageId = "FormatCellsMenu";
-            this.button4.ScreenTip = "将所有列的宽度调整为默认宽度（80像素）。";
-            this.button4.ShowImage = true;
-            this.button4.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CollapseAction);
-            // 
-            // button5
-            // 
-            this.button5.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button5.Label = "生成序号";
-            this.button5.Name = "button5";
-            this.button5.OfficeImageId = "FormatNumberDefault";
-            this.button5.ScreenTip = "将序号列由1开始递增填充。";
-            this.button5.ShowImage = true;
-            this.button5.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.FormatAction);
-            // 
-            // button6
-            // 
-            this.button6.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button6.Label = "检查序号";
-            this.button6.Name = "button6";
-            this.button6.OfficeImageId = "FileViewDigitalSignatures";
-            this.button6.ScreenTip = "检查序号列是否有重复的序号。";
-            this.button6.ShowImage = true;
-            this.button6.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.IdCheckAction);
-            // 
-            // button7
-            // 
-            this.button7.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button7.Label = "检查当前表格";
-            this.button7.Name = "button7";
-            this.button7.OfficeImageId = "FileMarkAsFinal";
-            this.button7.ScreenTip = "使用表格检查工具检查当前表格。";
-            this.button7.ShowImage = true;
-            this.button7.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CSVCheckAction);
-            // 
-            // button8
-            // 
-            this.button8.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button8.Label = "检查所有表格";
-            this.button8.Name = "button8";
-            this.button8.OfficeImageId = "ReviewEndReviewPowerPoint";
-            this.button8.ScreenTip = "使用表格检查工具检查所有表格。";
-            this.button8.ShowImage = true;
-            this.button8.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CSVCheckAllAction);
-            // 
-            // button9
-            // 
-            this.button9.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button9.Label = "打开检查表";
-            this.button9.Name = "button9";
-            this.button9.OfficeImageId = "OpenAttachedMasterPage";
-            this.button9.ScreenTip = "打开对应CSV的检查配置表格。";
-            this.button9.ShowImage = true;
-            this.button9.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CSVOpenCheckAction);
-            // 
-            // button10
-            // 
-            this.button10.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button10.Label = "预览默认资源";
-            this.button10.Name = "button10";
-            this.button10.OfficeImageId = "OmsImageFromFile";
-            this.button10.ScreenTip = "预览选中单元格中资源路径对应的默认图片资源。";
-            this.button10.ShowImage = true;
-            this.button10.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OpenImageAction);
-            // 
-            // button11
-            // 
-            this.button11.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.button11.Label = "预览国际化资源";
-            this.button11.Name = "button11";
-            this.button11.OfficeImageId = "OmsImageFromClip";
-            this.button11.ScreenTip = "预览选中单元格中国际化资源路径对应的图片资源。";
-            this.button11.ShowImage = true;
-            this.button11.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OpenIOSImageAction);
-            // 
-            // button12
-            // 
-            this.button12.Label = "";
-            this.button12.Name = "button12";
-            // 
-            // button13
-            // 
-            this.button13.Label = "提交";
-            this.button13.Name = "button13";
-            this.button13.OfficeImageId = "UpgradeWorkbook";
-            this.button13.ShowImage = true;
-            this.button13.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button13_Click);
-            // 
-            // button16
-            // 
-            this.button16.Label = "查看日志";
-            this.button16.Name = "button16";
-            this.button16.OfficeImageId = "ContactProperties";
-            this.button16.ShowImage = true;
-            this.button16.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button16_Click);
-            // 
-            // button14
-            // 
-            this.button14.Label = "还原";
-            this.button14.Name = "button14";
-            this.button14.OfficeImageId = "Refresh";
-            this.button14.ShowImage = true;
-            this.button14.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button14_Click);
-            // 
-            // button15
-            // 
-            this.button15.Label = "和仓库版本比较";
-            this.button15.Name = "button15";
-            this.button15.OfficeImageId = "ReviewCompareLastVersion";
-            this.button15.ShowImage = true;
-            this.button15.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button15_Click);
+            this.group6.Visible = false;
             // 
             // button17
             // 
@@ -417,6 +408,10 @@
             this.button20.ShowImage = true;
             this.button20.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Button20_Click);
             // 
+            // separator6
+            // 
+            this.separator6.Name = "separator6";
+            // 
             // button18
             // 
             this.button18.Label = "清除选中单元格样式";
@@ -432,6 +427,12 @@
             this.button19.OfficeImageId = "ClearAll";
             this.button19.ShowImage = true;
             this.button19.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Button19_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.Label = "自动加载/保存样式";
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.CheckBox1_Click);
             // 
             // Ribbon1
             // 

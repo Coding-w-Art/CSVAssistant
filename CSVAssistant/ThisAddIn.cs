@@ -64,6 +64,7 @@ namespace CSVAssistant
             SetDiffRegionMenu();
             jsonFile = Path.GetDirectoryName(app.ActiveWorkbook.FullName) + string.Format("/../../../Excel/{0}/{1}.{2}", I8N_DIRECTORY, Path.GetFileNameWithoutExtension(app.ActiveWorkbook.Name), "json");
             Globals.Ribbons.Ribbon1.button17.Enabled = File.Exists(jsonFile);
+            Properties.Settings.Default.autoLoadFormat = false;
             Globals.Ribbons.Ribbon1.checkBox1.Checked = Properties.Settings.Default.autoLoadFormat;
         }
 
